@@ -23,6 +23,8 @@ This is the remote execution script for actually flashing the image on the route
 
 ## Setup
 
+### TODO SSH/Keys
+
 ### IPV6
 
 Path | Field | Value
