@@ -7,7 +7,7 @@ Infrastructure setup for home network.
 * Red = VPN connected device
 * Green = Directly through AP
 
-![Network Diagram](plantuml/images/network.png)
+![Network Diagram](plantuml/network.png)
 
 ## Devices
 
