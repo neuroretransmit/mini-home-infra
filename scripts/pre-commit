@@ -1,4 +1,3 @@
 #!/bin/sh
 
 ./scripts/encrypt-backups.sh
-./scripts/generate-plantuml-diagram.sh

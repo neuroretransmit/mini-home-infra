@@ -17,18 +17,22 @@ else
 fi
 
 echo "Downloading latest firmware (FTP may throttle, be patient)..."
-./download-latest.py || echo 'Failed to download latest firmware.' && exit 1
+./download-latest.py 
+
+if [ $? -ne 0 ]; then
+	echo 'Failed to download latest firmware.' && exit 1
+fi
 
 echo "Copying firmware and remote script..."
 sshpass \
-	-P "Enter passphrase for key '/home/jonesy/.ssh/god':" \
+	-P "Enter passphrase for key" \
 	-p "$(bw get password $BW_SSH_KEY_PASS_ID)" \
 	scp $FIRMWARE_FNAME $ROUTER_FLASH_SCRIPT "$ROUTER_HOST:/tmp" \
 	|| echo 'Failed to copy firmware and remote script.' && exit 1
 
 echo "Opening shell and executing remote script..."
 sshpass \
-	-P "Enter passphrase for key '/home/jonesy/.ssh/god':" \
+	-P "Enter passphrase for key" \
 	-p "$(bw get password $BW_SSH_KEY_PASS_ID)" ssh $ROUTER_HOST \
 		"cd /tmp/ && sh router-flash-firmware.sh" \
 		|| echo 'Failed to execute remote script.' && exit 1

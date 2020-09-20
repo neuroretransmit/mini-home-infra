@@ -1,8 +1,6 @@
 # infra
 
-Infrastructure setup for home network.
-
-![Network Diagram](plantuml/network.png)
+Scripts for Pi-hole/DD-WRT.
 
 ## Devices
 
