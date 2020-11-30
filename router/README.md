@@ -2,7 +2,7 @@
 
 ## Scripts
 
-### [flash-firmware.sh](flash-firmware.sh)
+### [flash-firmware.sh](scripts/flash-firmware.sh)
 
 This script is the cradle for all scripts within this folder.
 
@@ -10,11 +10,11 @@ This script is the cradle for all scripts within this folder.
 2. SCP the downloaded binary and the remote script [router-flash-firmware.sh](router-flash-firmware.sh) to `/tmp/` on the router.
 3. SSH into the router and execute the remote script.
 
-### [download-latest.py](download-latest.py)
+### [download-latest.py](scripts/download-latest.py)
 
 Crawls FTP and downloads the latest firmware binary.
 
-### [router-flash-firmware.sh](router-flash-firmware.sh)
+### [router-flash-firmware.sh](scripts/router-flash-firmware.sh)
 
 This is the remote execution script for actually flashing the image on the router.
 
