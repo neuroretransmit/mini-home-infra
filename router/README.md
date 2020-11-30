@@ -23,13 +23,49 @@ This is the remote execution script for actually flashing the image on the route
 
 ## Setup
 
-### TODO SSH/Keys
+### Basic Setup
+
+Set hostname/domain and Timezone
+
+### Static IPs
+
+`Services->Services`
+
+Assign static IPs for VPN devices and Pi-hole.
+
+### Administration
+
+Set `Web Access->Protocol` to HTTPS , `Info Site Password Protection` to Enabled, `Router GUI Style` to Dark, `Display New Features` to Disabled.
+
+### SSH/Keys
+
+In `Services->Services->Secure Shell` enable SSHD and disable password authentication. Add your password protected public RSA key (setup fails with ed25519 keys as of writing this).
+
+`ssh-keygen`
+
+For easy re-entry create the following in `~/.ssh/config`
+
+```
+Host router
+	User root
+	HostName 192.168.1.1
+	Port 2222
+	IdentityFile ~/.ssh/god_ed25519
+```
 
 ### IPV6
+
+Not even once...
 
 Path | Field | Value
 --- | --- | ---
 Setup->IPV6 | IPv6 | Disable
+
+### Wireless
+
+1. Rename wireless networks
+2. `Wireless Security`: Change passwords under Wireless Security tab
+3. `MAC Filter`: Enable MAC filter to permit only listed clients and add them.
 
 ### UPnP
 
@@ -39,29 +75,48 @@ NAT/QoS->UPnP | UPnP Service | Disable
 
 ### VPN
 
-Set router DNS to VPN DNS and connect to VPN:
+Determine the fastest server for your VPN, or choose specified location
 
-Path | Field | Value
---- | --- | ---
-Setup->Basic Setup->Network Setup->Network Address Server Settings (DHCP) | Static DNS [0-3] | VPN Provider DNS
-Setup->Basic Setup->Network Setup->Network Address Server Settings (DHCP) | Use DNSMasq for DNS | Checked
-Setup->Basic Setup->Network Setup->Network Address Server Settings (DHCP) | DHCP Authoritative | Checked
-Services->VPN->OpenVPN Client | Start OpenVPN Client | Enable
-Services->VPN->OpenVPN Client | Server IP/Name | VPN server IP
-Services->VPN->OpenVPN Client | Port | 1194 for UDP 443 for TCP
-Services->VPN->OpenVPN Client | Tunnel Device | TUN
-Services->VPN->OpenVPN Client | Encryption Cipher | VPN specified
-Services->VPN->OpenVPN Client | Hash Algorithm | VPN specified
-Services->VPN->OpenVPN Client | User Pass Authentication | Enable
-Services->VPN->OpenVPN Client->User Pass Authentication | Username | VPN username
-Services->VPN->OpenVPN Client->User Pass Authentication | Password | VPN password
-Services->VPN->OpenVPN Client | TLS Cipher | VPN specified
-Services->VPN->OpenVPN Client | LZO Compression | Disable
-Services->VPN->OpenVPN Client | NAT | Enable
-Services->VPN->OpenVPN Client | TLS Key | VPN specified
-Services->VPN->OpenVPN Client | Additional Config | VPN specified
-Services->VPN->OpenVPN Client | Policy based Routing | IPs you want on VPN
-Services->VPN->OpenVPN Client | CA Cert | VPN specified
+![](openvpn-client.png)
+
+And add the TLS Key/CA Cert
+
+In the `Advanced Options` section add the following
+
+```
+auth-nocache
+remote-cert-tls server
+remote-random
+nobind
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+ping-timer-rem
+reneg-sec 0
+#log /tmp/vpn.log
+#Delete `#` in the line below if your router does not have credentials fields and you followed the 3.1 step
+#auth-user-pass /tmp/openvpncl/user.conf
+```
+
+Under `Administration->Commands` add the following to `Startup`
+
+```
+# Fix warning in OpenVPN logs about credentials being group-writeable
+chmod 600 /tmp/openvpncl/credentials
+```
+
+And add the following to `Firewall`
+
+```
+# OpenVPN client policy-based routing killswitch for dropped VPN connection
+# to disallow traffic without VPN.
+
+# <hostname here>
+iptables -I FORWARD -s <static ip here> -o $(nvram get wan_iface) -j DROP
+
+```
 
 #### Killswitch for dropped VPN connection
 
@@ -70,12 +125,8 @@ Add the following to commands, replacing each IP with the IPs you used in policy
 ```
 # OpenVPN client policy-based routing killswitch for dropped VPN connection
 # to disallow traffic without VPN.
-iptables -I FORWARD -s 192.168.1.146 -o $(nvram get wan_iface) -j DROP
-iptables -I FORWARD -s 192.168.1.106 -o $(nvram get wan_iface) -j DROP
-iptables -I FORWARD -s 192.168.1.117 -o $(nvram get wan_iface) -j DROP
-iptables -I FORWARD -s 192.168.1.105 -o $(nvram get wan_iface) -j DROP
-iptables -I FORWARD -s 192.168.1.139 -o $(nvram get wan_iface) -j DROP
-iptables -I FORWARD -s 192.168.1.132 -o $(nvram get wan_iface) -j DROP
+iptables -I FORWARD -s <ip here> -o $(nvram get wan_iface) -j DROP
+# add other devices here or use range
 ```
 
 ## Pi-hole (optional)

@@ -8,9 +8,9 @@ I've been told this runs fine even on a Raspberry Pi Zero, however I'd recommend
 
 Install [rpi-imager](https://www.raspberrypi.org/downloads/) and install Raspberry Pi OS (lite) from `Choose OS->Rapberry Pi OS (other)->Raspberry Pi OS Lite (32-bit)` to your SD card.
 
-On first boot, set your upstream DNS to your VPN provider's. Once at a shell, make sure the pihole is up to date.
+Once at a shell, make sure the pihole is up to date.
 
-`sudo apt update && sudo apt full-upgrade && reboot`
+`sudo apt update && sudo apt full-upgrade && sudo apt install vim && sudo reboot`
 
 ### Change Passwords/SSH Key
 
@@ -47,12 +47,27 @@ Host pihole
 
 Now you can simply `ssh pihole`.
 
+### Install Pi-hole
+
+```bash
+curl -sSL https://install.pi-hole.net | bash
+```
+
+Set your upstream DNS to your VPN provider's.
+
+#### Modify Admin Password
+
+```bash
+pihole -a -p
+```
+
 ### Adlists
 
 ```
 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts 	
 https://mirror1.malwaredomains.com/files/justdomains 	
-https://github.com/kboghdady/youTube_ads_4_pi-hole/blob/master/youtubelist.txt 	
+https://raw.githubusercontent.com/kboghdady/youTube_ads_4_pi-hole/master/huluads.txt
+https://raw.githubusercontent.com/kboghdady/youTube_ads_4_pi-hole/master/youtubelist.txt
 https://github.com/d43m0nhLInt3r/socialblocklists/blob/master/SmartTV/smarttvblocklist.txt 	
 https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/android-tracking.txt 	
 https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt 	
