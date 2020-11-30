@@ -36,6 +36,7 @@ try:
     # Navigate to target device folder and pull down binary
     data = []
     START_PATH += newest + '/' + TARGET_DEVICE + '/'
+    print("Downloading latest from %s..." % START_PATH)
     ftp.cwd(START_PATH)
     ftp.retrbinary('RETR ' + FILE_NAME, open(FILE_NAME, 'wb').write)
     ftp.quit()

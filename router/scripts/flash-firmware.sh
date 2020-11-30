@@ -6,6 +6,10 @@ ROUTER_FLASH_SCRIPT="router-flash-firmware.sh"
 # ID for BitWarden entry
 BW_SSH_KEY_PASS_ID="a75c2116-499d-411c-8354-ac1601335057"
 
+if ! [ -x "$(command -v bw)" ]; then
+	echo "ERROR: Please install BitWarden CLI" && exit 1
+fi
+
 # Check if BitWarden session is active
 if [ -z ${BW_SESSION+x} ]; then
 	echo "BitWarden session is unset. Please run 'bw login' and export \$BW_SESSION."
@@ -16,11 +20,17 @@ else
 	bw sync
 fi
 
+# TODO: Check if existing file is latest
 echo "Downloading latest firmware (FTP may throttle, be patient)..."
 ./download-latest.py 
 
 if [ $? -ne 0 ]; then
 	echo 'Failed to download latest firmware.' && exit 1
+fi
+
+
+if ! [ -x "$(command -v sshpass)" ]; then
+		echo "ERROR: Please install 'sshpass'" && exit 1
 fi
 
 echo "Copying firmware and remote script..."
@@ -38,3 +48,4 @@ sshpass \
 		|| echo 'Failed to execute remote script.' && exit 1
 
 echo "Done."
+
