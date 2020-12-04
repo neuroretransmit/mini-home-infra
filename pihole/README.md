@@ -6,7 +6,8 @@ I've been told this runs fine even on a Raspberry Pi Zero, however I'd recommend
 
 ## Setup
 
-Install [rpi-imager](https://www.raspberrypi.org/downloads/) and install Raspberry Pi OS (lite) from `Choose OS->Rapberry Pi OS (other)->Raspberry Pi OS Lite (32-bit)` to your SD card.
+Install [rpi-imager](https://www.raspberrypi.org/downloads/) and install
+Raspberry Pi OS (lite) from `Choose OS->Rapberry Pi OS (other)->Raspberry Pi OS Lite (32-bit)` to your SD card.
 
 Once at a shell, make sure the pihole is up to date.
 
@@ -16,18 +17,25 @@ Once at a shell, make sure the pihole is up to date.
 
 #### Passwords
 
-SSH into the pihole and change password for user `pi`, then login as `root` and do the same.
+SSH into the pihole and change password for user `pi`, then login as `root` and
+do the same.
 
 #### SSH Key/Port
 
-Use the [ssh-keygen.sh](../scripts/ssh-keygen.sh) script to generate an SSH key with preferred security settings. Set a password for the key as well. If you saved the key to a different location than `~/.ssh/id_rsa`, use the `-i ~/some/path` flag in addition to this command.
+Use the [ssh-keygen.sh](../scripts/ssh-keygen.sh) script to generate an SSH key
+with preferred security settings (ed25519 instead of RSA). Set a password for
+the key as well if you are extra paranoid like myself. If you saved the key to a
+different location than `~/.ssh/id_rsa`, use the `-i ~/some/path` flag in
+addition to this command.
 
 `ssh-copy-id pi@<IP-ADDRESS>`
 
-Now SSH into the pihole and edit `/etc/ssh/sshd_config` and set the following lines.
+Now SSH into the pihole and edit `/etc/ssh/sshd_config` and set the following
+lines, port is optional - I like to stick common services on non-standard ports
+on a really high or ephemeral port.
 
 ```
-Port 2222
+Port 22222
 PasswordAuthentication no
 ```
 
@@ -35,13 +43,13 @@ Finally, restart the SSH daemon.
 
 `sudo systemctl restart sshd && logout`
 
-For easy re-entry, create an entry in `~/.ssh/config`.
+For easy re-entry, create an entry in `~/.ssh/config` on your local machine. You can just `ssh <Host field>` without specifying key.
 
 ```
 Host pihole
 	User pi
 	HostName <IP-ADDRESS>
-	Port 2222
+	Port 22222
 	IdentityFile <PATH TO PIHOLE SSH PRIVATE KEY>
 ```
 
@@ -49,13 +57,15 @@ Now you can simply `ssh pihole`.
 
 ### Install Pi-hole
 
+Make sure to copy admin password from the last screen
+
 ```bash
 curl -sSL https://install.pi-hole.net | bash
 ```
 
-Set your upstream DNS to your VPN provider's.
+Set your upstream DNS to your VPN provider's or CloudFlare's (1.1.1.1 and 1.0.0.1)
 
-#### Modify Admin Password
+#### Modify Admin Password (optional, will be random on initial generation)
 
 ```bash
 pihole -a -p
@@ -93,3 +103,15 @@ https://v.firebog.net/hosts/Prigent-Phishing.txt
 https://github.com/chadmayfield/pihole-blocklists/raw/master/lists/pi_blocklist_porn_all.list 	
 https://zerodot1.gitlab.io/CoinBlockerLists/hosts
 ```
+
+### Whitelist RegEx
+
+In the admin page (http://pi.hole/admin) or under your IP if your DNS isn't
+pointing to the Pi-hole yet, navigate to `Whitelist->Regex filter` and add the
+following to unblock servers for YouTube, the adlist catches some valid servers.
+
+`r[0-9]---sn-[a-z0-9]{8}\.googlevideo.com`
+
+### Use DNSSEC
+
+`Settings->DNS` and check use DNSSEC
