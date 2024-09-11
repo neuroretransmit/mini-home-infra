@@ -1,4 +1,4 @@
-# infra
+# mini-home-infra
 
 Scripts for Pi-hole/DD-WRT.
 
